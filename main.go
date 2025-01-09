@@ -14,6 +14,6 @@ func main() {
 	if err != nil {
 		fmt.Println("error")
 	}
-	fmt.Println("servidor en http://localhost:5000", db.Stats())
+	fmt.Println("servidor en http://localhost:5000", db.Name())
 	http.ListenAndServe(":5000", nil)
 }

@@ -19,7 +19,8 @@ func ConnectDB() (*gorm.DB, error) {
 		log.Fatal(err)
 		return nil, err
 	}
-	db.AutoMigrate(&models.Post{}, &models.User{})
+	db.AutoMigrate(&models.User{})
+	db.AutoMigrate(&models.Post{})
 	log.Println("Conectado a BBDD")
 	return db, nil
 }

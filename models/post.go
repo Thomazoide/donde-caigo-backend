@@ -6,7 +6,7 @@ type Post struct {
 	gorm.Model
 	Title       string
 	Description string
-	Pics        []string
+	Pics        string
 	AuthorID    uint
-	Stars       []int `gorm:"default:null"`
+	Stars       string `gorm:"default:null"`
 }

@@ -89,7 +89,7 @@ func (s *APIServer) handleCreateAccount(w http.ResponseWriter, r *http.Request) 
 	if decodeErr != nil {
 		return decodeErr
 	}
-	result, insertErr := userService.CreateUser(newUser.Nombre, newUser.Rut, newUser.Email, newUser.ProfilePicture, newUser.ProfileDescription, newUser.Age)
+	result, insertErr := userService.CreateUser(newUser.Nombre, newUser.Password, newUser.Rut, newUser.Email, newUser.ProfilePicture, newUser.ProfileDescription, newUser.Age)
 	if insertErr != nil {
 		return insertErr
 	}

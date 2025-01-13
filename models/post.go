@@ -10,3 +10,13 @@ type Post struct {
 	AuthorID    uint
 	Stars       string `gorm:"default:null"`
 }
+
+func CreatePost(title string, desc string, pics string, authorID uint, stars string) *Post {
+	return &Post{
+		Title:       title,
+		Description: desc,
+		Pics:        pics,
+		AuthorID:    authorID,
+		Stars:       stars,
+	}
+}

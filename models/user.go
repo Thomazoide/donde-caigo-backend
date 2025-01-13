@@ -23,8 +23,3 @@ func CreateUser(nombre string, rut string, email string, pfp string, desc string
 		Age:                age,
 	}
 }
-
-func GetAllUsers() []User {
-	//this function is empy because is under construction
-	return nil
-}

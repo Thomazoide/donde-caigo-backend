@@ -1,9 +1,12 @@
 package controller
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 
+	"github.com/Thomazoide/donde-caigo-backend/models"
+	"github.com/Thomazoide/donde-caigo-backend/service"
 	"github.com/Thomazoide/donde-caigo-backend/structs"
 )
 
@@ -26,10 +29,27 @@ func (s *APIServer) handleAccount(w http.ResponseWriter, r *http.Request) error 
 }
 
 func (s *APIServer) handleGetAccount(w http.ResponseWriter, r *http.Request) error {
+
 	return nil
 }
 
 func (s *APIServer) handleCreateAccount(w http.ResponseWriter, r *http.Request) error {
+	userService := service.NewUserService()
+	var newUser models.User
+	decodeErr := json.NewDecoder(r.Body).Decode(&newUser)
+	if decodeErr != nil {
+		return decodeErr
+	}
+	result, insertErr := userService.CreateUser(newUser.Nombre, newUser.Rut, newUser.Email, newUser.ProfilePicture, newUser.ProfileDescription, newUser.Age)
+	if insertErr != nil {
+		return insertErr
+	}
+	response := &structs.ApiResponse{
+		StatusCode: http.StatusCreated,
+		Message:    "usuario creado",
+		Data:       result,
+	}
+	WriteJSON(w, http.StatusCreated, response)
 	return nil
 }
 

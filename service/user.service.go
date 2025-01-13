@@ -2,6 +2,7 @@ package service
 
 import (
 	"github.com/Thomazoide/donde-caigo-backend/config"
+	"github.com/Thomazoide/donde-caigo-backend/middleware"
 	"github.com/Thomazoide/donde-caigo-backend/models"
 	"gorm.io/gorm"
 )
@@ -16,8 +17,13 @@ func NewUserService() *UserService {
 	}
 }
 
-func (s *UserService) CreateUser(nomrbe string, rut string, email string, pfp string, desc string, age int64) (*models.User, error) {
-	var newUser *models.User = models.CreateUser(nomrbe, rut, email, pfp, desc, age)
+func (s *UserService) CreateUser(nomrbe string, password string, rut string, email string, pfp string, desc string, age int64) (*models.User, error) {
+	encrypter := middleware.NewEncrypter()
+	hashPass, hashErr := encrypter.HashPassword(password)
+	if hashErr != nil {
+		return nil, hashErr
+	}
+	var newUser *models.User = models.CreateUser(nomrbe, hashPass, rut, email, pfp, desc, age)
 	err := s.instance.Create(newUser)
 	if err.Error != nil {
 		return nil, err.Error
@@ -27,7 +33,7 @@ func (s *UserService) CreateUser(nomrbe string, rut string, email string, pfp st
 
 func (s *UserService) GetAllUsers() ([]models.User, error) {
 	var users []models.User
-	result := s.instance.Find(&users)
+	result := s.instance.Select("nombre", "email", "rut", "profile_picture", "profile_description", "age").Find(&users)
 	if result.Error != nil {
 		return nil, result.Error
 	}

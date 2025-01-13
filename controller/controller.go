@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/Thomazoide/donde-caigo-backend/middleware"
 	"github.com/Thomazoide/donde-caigo-backend/structs"
 	"github.com/gorilla/mux"
 )
@@ -42,6 +43,10 @@ func NewAPIServer(listenAddr string) *APIServer {
 
 func (s *APIServer) RunServer() {
 	router := mux.NewRouter()
+	middleware.EnableCORS(router)
+	router.Use(middleware.MiddlewareCORS)
 	router.HandleFunc("/cuenta", makeHTTPHandlerFunc(s.handleAccount))
+	router.HandleFunc("/cuenta/{id}", makeHTTPHandlerFunc(s.handleAccountWithParams))
+	router.HandleFunc("/publicaciones", makeHTTPHandlerFunc(s.handlePost))
 	http.ListenAndServe(s.listenAddr, router)
 }

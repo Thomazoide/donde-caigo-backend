@@ -18,7 +18,7 @@ func NewPostService() *PostService {
 
 func (s *PostService) GetAllPost() ([]models.Post, error) {
 	var posts []models.Post
-	result := s.instance.Find(&posts)
+	result := s.instance.Select("title", "description", "pics", "author_id", "stars").Find(&posts)
 	if result.Error != nil {
 		return nil, result.Error
 	}
@@ -32,4 +32,25 @@ func (s *PostService) CreatePost(title string, desc string, pics string, authorI
 		return nil, result.Error
 	}
 	return post, nil
+}
+
+func (s *PostService) EditPost(post *models.Post) (*models.Post, error) {
+	result := s.instance.Save(&post)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return post, nil
+}
+
+func (s *PostService) DeletePost(postID uint) error {
+	var post *models.Post
+	result := s.instance.Where("id = ?", postID).First(&post)
+	if result.Error != nil {
+		return result.Error
+	}
+	result = s.instance.Delete(&post)
+	if result.Error != nil {
+		return result.Error
+	}
+	return nil
 }

@@ -45,6 +45,7 @@ func (s *APIServer) RunServer() {
 	router := mux.NewRouter()
 	middleware.EnableCORS(router)
 	router.Use(middleware.MiddlewareCORS)
+	router.HandleFunc("/auth", makeHTTPHandlerFunc(s.handleAuth))
 	router.HandleFunc("/cuenta", makeHTTPHandlerFunc(s.handleAccount))
 	router.HandleFunc("/cuenta/{id}", makeHTTPHandlerFunc(s.handleAccountWithParams))
 	router.HandleFunc("/publicaciones", makeHTTPHandlerFunc(s.handlePost))

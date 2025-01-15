@@ -2,6 +2,7 @@ package controller
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/Thomazoide/donde-caigo-backend/middleware"
@@ -23,14 +24,15 @@ func WriteJSON(w http.ResponseWriter, status int, v any) error {
 
 func makeHTTPHandlerFunc(h apiFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		if err := h(w, r); err != nil {
+		err := h(w, r)
+		if err != nil {
+			fmt.Println(err)
 			response := &structs.ApiResponse{
 				StatusCode: http.StatusBadRequest,
 				Message:    "BAD REQUEST",
 				Error:      err,
 			}
 			WriteJSON(w, http.StatusBadRequest, response)
-			return
 		}
 	}
 }

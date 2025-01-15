@@ -24,13 +24,21 @@ func (s *APIServer) handleAuth(w http.ResponseWriter, r *http.Request) error {
 func (s *APIServer) handleLogin(w http.ResponseWriter, r *http.Request) error {
 	var authPayload *structs.LoginPayload
 	decodeErr := json.NewDecoder(r.Body).Decode(&authPayload)
+	fmt.Println(authPayload)
 	if decodeErr != nil {
 		return decodeErr
 	}
 	authService := service.NewAuthService()
-	loginErr := authService.Login(authPayload.Email, authPayload.Password)
+	token, loginErr := authService.Login(authPayload.Email, authPayload.Password)
 	if loginErr != nil {
 		return loginErr
 	}
+	authService.SignCookie(w, *token)
+	response := &structs.ApiResponse{
+		StatusCode: http.StatusAccepted,
+		Message:    "sesion iniciada",
+		Data:       token,
+	}
+	WriteJSON(w, http.StatusAccepted, response)
 	return nil
 }

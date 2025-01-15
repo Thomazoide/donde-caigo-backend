@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"fmt"
 	"os"
 	"strconv"
 
@@ -15,8 +16,9 @@ type Encrypter struct {
 
 func NewEncrypter() *Encrypter {
 	godotenv.Load()
-	saltrounds, err := strconv.Atoi("SALT")
+	saltrounds, err := strconv.Atoi(os.Getenv("SALT"))
 	if err != nil {
+		fmt.Println(err)
 		return nil
 	}
 	pepper := os.Getenv("PEPPER")
@@ -40,6 +42,6 @@ func (e *Encrypter) HashPassword(password string) (string, error) {
 
 func (e *Encrypter) VerifyPassword(password string, hashedPassword string) bool {
 	passwordAndPepper := password + e.pepper
-	err := bcrypt.CompareHashAndPassword([]byte(passwordAndPepper), []byte(hashedPassword))
+	err := bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(passwordAndPepper))
 	return err == nil
 }

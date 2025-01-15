@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+	"math/rand"
 	"net/http"
 	"os"
 	"time"
@@ -41,7 +42,7 @@ func (s *AuthService) Login(email string, password string) (*string, error) {
 
 func GenerateToken(user *models.User) string {
 	godotenv.Load()
-	var token string = user.Password + ":" + fmt.Sprint(user.ID) + ":" + os.Getenv("SECRET")
+	var token string = user.Password + fmt.Sprintf("%d", rand.Int()) + ":" + fmt.Sprint(user.ID) + ":" + os.Getenv("SECRET")
 	return token
 }
 

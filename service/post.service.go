@@ -1,6 +1,8 @@
 package service
 
 import (
+	"strconv"
+
 	"github.com/Thomazoide/donde-caigo-backend/config"
 	"github.com/Thomazoide/donde-caigo-backend/models"
 	"gorm.io/gorm"
@@ -40,6 +42,16 @@ func (s *PostService) EditPost(post *models.Post) (*models.Post, error) {
 		return nil, result.Error
 	}
 	return post, nil
+}
+
+func (s *PostService) AddLike(post *models.Post, id uint) (*models.Post, error) {
+	sid := strconv.FormatUint(uint64(id), 10)
+	tmpPost := post
+	tmpPost.Stars = tmpPost.Stars + "," + sid
+	if err := s.instance.Save(&tmpPost).Error; err != nil {
+		return nil, err
+	}
+	return tmpPost, nil
 }
 
 func (s *PostService) DeletePost(postID uint) error {

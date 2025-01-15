@@ -17,6 +17,9 @@ func (s *APIServer) handlePost(w http.ResponseWriter, r *http.Request) error {
 	if r.Method == http.MethodPost {
 		return s.handleCreatePost(w, r)
 	}
+	if r.Method == http.MethodPatch {
+		return s.handleAddLike(w, r)
+	}
 	if r.Method == http.MethodDelete {
 		return s.handleDeletePost(w, r)
 	}
@@ -62,6 +65,26 @@ func (s *APIServer) handleCreatePost(w http.ResponseWriter, r *http.Request) err
 		Data:       newPost,
 	}
 	WriteJSON(w, http.StatusCreated, response)
+	return nil
+}
+
+func (s *APIServer) handleAddLike(w http.ResponseWriter, r *http.Request) error {
+	postService := service.NewPostService()
+	var likePayload *structs.LikePayload
+	decodeErr := json.NewDecoder(r.Body).Decode(&likePayload)
+	if decodeErr != nil {
+		return decodeErr
+	}
+	updatedPost, updateErr := postService.AddLike(&likePayload.Post, likePayload.Id)
+	if updateErr != nil {
+		return updateErr
+	}
+	response := &structs.ApiResponse{
+		StatusCode: http.StatusAccepted,
+		Message:    "Like",
+		Data:       updatedPost,
+	}
+	WriteJSON(w, http.StatusAccepted, response)
 	return nil
 }
 

@@ -75,7 +75,7 @@ func (s *APIServer) handleGetAccountByID(w http.ResponseWriter, r *http.Request)
 	}
 	response := &structs.ApiResponse{
 		StatusCode: http.StatusOK,
-		Message:    "Usuario eliminado",
+		Message:    "Usuario encontrado",
 		Data:       usr,
 	}
 	WriteJSON(w, http.StatusOK, response)

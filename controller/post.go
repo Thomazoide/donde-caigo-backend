@@ -55,7 +55,7 @@ func (s *APIServer) handleCreatePost(w http.ResponseWriter, r *http.Request) err
 	if decodeErr != nil {
 		return decodeErr
 	}
-	newPost, err := postService.CreatePost(tmpPost.Title, tmpPost.Description, tmpPost.Pics, tmpPost.AuthorID, tmpPost.Stars)
+	newPost, err := postService.CreatePost(tmpPost.Title, tmpPost.Description, tmpPost.Pics, tmpPost.AuthorID)
 	if err != nil {
 		return err
 	}

@@ -27,8 +27,13 @@ func (s *PostService) GetAllPost() ([]models.Post, error) {
 	return posts, nil
 }
 
-func (s *PostService) CreatePost(title string, desc string, pics string, authorID uint, stars string) (*models.Post, error) {
-	post := models.CreatePost(title, desc, pics, authorID, stars)
+func (s *PostService) CreatePost(title string, desc string, pics string, authorID uint) (*models.Post, error) {
+	post := models.CreatePost(title, desc, pics, authorID)
+	var userExists *models.User
+	exists := s.instance.Where("ID = ?", authorID).Select("ID").First(&userExists).Error
+	if exists != nil {
+		return nil, exists
+	}
 	result := s.instance.Create(&post)
 	if result.Error != nil {
 		return nil, result.Error

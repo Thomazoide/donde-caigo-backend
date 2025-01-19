@@ -15,7 +15,7 @@ var db *gorm.DB
 
 func ConnectDB() error {
 	godotenv.Load()
-	var connectionString string = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", os.Getenv("DBUSER"), os.Getenv("DBPASS"), os.Getenv("DBHOST"), os.Getenv("DBPORT"), os.Getenv("DBNAME"))
+	var connectionString string = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true", os.Getenv("DBUSER"), os.Getenv("DBPASS"), os.Getenv("DBHOST"), os.Getenv("DBPORT"), os.Getenv("DBNAME"))
 	var err error
 	db, err = gorm.Open(mysql.Open(connectionString), &gorm.Config{})
 	if err != nil {

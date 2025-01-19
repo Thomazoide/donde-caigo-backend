@@ -38,7 +38,7 @@ func (s *UserService) CreateUser(nomrbe string, password string, rut string, ema
 
 func (s *UserService) GetAllUsers() ([]models.User, error) {
 	var users []models.User
-	result := s.instance.Select("nombre", "email", "rut", "profile_picture", "profile_description", "age").Find(&users)
+	result := s.instance.Select("ID", "nombre", "email", "rut", "profile_picture", "profile_description", "age").Find(&users)
 	if result.Error != nil {
 		return nil, result.Error
 	}
@@ -48,7 +48,7 @@ func (s *UserService) GetAllUsers() ([]models.User, error) {
 func (s *UserService) GetUserByID(id uint) (*models.User, error) {
 	var user *models.User
 	fmt.Println(id)
-	result := s.instance.Where("ID = ?", id).Select("nombre", "email", "rut", "profile_picture", "profile_description", "age").First(&user)
+	result := s.instance.Where("ID = ?", id).First(&user)
 	if result.Error != nil {
 		return nil, result.Error
 	}
@@ -64,9 +64,30 @@ func (s *UserService) UpdateUser(usr *models.User) (*models.User, error) {
 }
 
 func (s *UserService) DeleteUser(usr *models.User) error {
-	result := s.instance.Delete(usr)
+	result := s.instance.Where("ID = ?", usr.ID).Delete(usr)
 	if result.Error != nil {
 		return result.Error
+	}
+	return nil
+}
+
+func (s *UserService) UpdatePassword(id uint, actualPassword string, newPassword string) error {
+	encrypter := middleware.NewEncrypter()
+	var user *models.User
+	err := s.instance.Where("ID = ?", id).Select("*").First(&user).Error
+	if err != nil {
+		return err
+	}
+	if !encrypter.VerifyPassword(actualPassword, user.Password) {
+		return fmt.Errorf("clave incorrecta")
+	}
+	newHasehdPassword, hashErr := encrypter.HashPassword(newPassword)
+	if hashErr != nil {
+		return hashErr
+	}
+	user.Password = newHasehdPassword
+	if saveErr := s.instance.Save(&user).Error; saveErr != nil {
+		return saveErr
 	}
 	return nil
 }

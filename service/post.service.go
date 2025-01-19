@@ -20,7 +20,7 @@ func NewPostService() *PostService {
 
 func (s *PostService) GetAllPost() ([]models.Post, error) {
 	var posts []models.Post
-	result := s.instance.Select("title", "description", "pics", "author_id", "stars").Find(&posts)
+	result := s.instance.Find(&posts)
 	if result.Error != nil {
 		return nil, result.Error
 	}

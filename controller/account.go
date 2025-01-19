@@ -37,6 +37,9 @@ func (s *APIServer) handleAccountWithParams(w http.ResponseWriter, r *http.Reque
 	if r.Method == http.MethodGet {
 		return s.handleGetAccountByID(w, r)
 	}
+	if r.Method == http.MethodPost {
+		return s.handleUpdatePassword(w, r)
+	}
 	WriteJSON(w, http.StatusMethodNotAllowed, &structs.ApiResponse{
 		StatusCode: http.StatusMethodNotAllowed,
 		Message:    "METHOD NOT ALLOWED",
@@ -137,6 +140,27 @@ func (s *APIServer) handleUpdateUser(w http.ResponseWriter, r *http.Request) err
 		StatusCode: http.StatusAccepted,
 		Message:    "usuario actualizado",
 		Data:       updatedUser,
+	}
+	WriteJSON(w, http.StatusAccepted, response)
+	return nil
+}
+
+func (s *APIServer) handleUpdatePassword(w http.ResponseWriter, r *http.Request) error {
+	userService := service.NewUserService()
+	id, parseErr := strconv.ParseUint(mux.Vars(r)["id"], 10, 32)
+	if parseErr != nil {
+		return parseErr
+	}
+	var payload *structs.ChangePasswordPayload
+	if decodeErr := json.NewDecoder(r.Body).Decode(&payload); decodeErr != nil {
+		return decodeErr
+	}
+	if changePassErr := userService.UpdatePassword(uint(id), payload.ActualPassword, payload.NewPassword); changePassErr != nil {
+		return changePassErr
+	}
+	response := &structs.ApiResponse{
+		StatusCode: http.StatusAccepted,
+		Message:    "Clave actualizada",
 	}
 	WriteJSON(w, http.StatusAccepted, response)
 	return nil

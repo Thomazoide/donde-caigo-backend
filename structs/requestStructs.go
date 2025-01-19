@@ -8,6 +8,11 @@ type LoginPayload struct {
 }
 
 type LikePayload struct {
-	Post models.Post
-	Id   uint
+	Post models.Post `json:"post"`
+	Id   uint        `json:"id"`
+}
+
+type ChangePasswordPayload struct {
+	ActualPassword string `json:"actualPassword"`
+	NewPassword    string `json:"newPassword"`
 }

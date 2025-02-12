@@ -50,19 +50,45 @@ func (s *APIServer) handleGetPost(w http.ResponseWriter, r *http.Request) error 
 
 func (s *APIServer) handleCreatePost(w http.ResponseWriter, r *http.Request) error {
 	postService := service.NewPostService()
-	var tmpPost *models.Post
-	decodeErr := json.NewDecoder(r.Body).Decode(&tmpPost)
-	if decodeErr != nil {
-		return decodeErr
+	newPostString := r.FormValue("post")
+	var newPost *models.Post
+	decodeErr := json.Unmarshal([]byte(newPostString), &newPost)
+	createdPost, createPostErr := postService.CreatePost(newPost.Title, newPost.Description, "", newPost.AuthorID)
+	if createPostErr != nil {
+		return fmt.Errorf("error al crear post\nDetalles: %v", createPostErr)
 	}
-	newPost, err := postService.CreatePost(tmpPost.Title, tmpPost.Description, tmpPost.Pics, tmpPost.AuthorID)
-	if err != nil {
-		return err
+	if decodeErr != nil {
+		return fmt.Errorf("error al decodificar json\nDetalles: %v", decodeErr)
+	}
+	sizeErr := r.ParseMultipartForm(10 << 20)
+	if sizeErr != nil {
+		return fmt.Errorf("error al parsear formulario\nDetalles: %v", sizeErr)
+	}
+	var imageURLS string = ""
+	for _, fileHeaders := range r.MultipartForm.File["pics"] {
+		file, fileErr := fileHeaders.Open()
+		if fileErr != nil {
+			return fmt.Errorf("error al abrir archivo\nDetalles: %v", fileErr)
+		}
+		defer file.Close()
+		imageURL, uploadErr := service.UploadImages(r.Context(), fileHeaders.Filename, createdPost.ID, file)
+		if uploadErr != nil {
+			return fmt.Errorf("error al subir imagen\nDetalles: %v", uploadErr)
+		}
+		if imageURLS == "" {
+			imageURLS = imageURL
+		} else {
+			imageURLS = imageURLS + "," + imageURL
+		}
+	}
+	createdPost.Pics = imageURLS
+	if _, updateErr := postService.EditPost(createdPost); updateErr != nil {
+		return fmt.Errorf("error al editar post\nDetalles: %v", updateErr)
 	}
 	response := &structs.ApiResponse{
 		StatusCode: http.StatusCreated,
 		Message:    "post creado",
-		Data:       newPost,
+		Data:       createdPost,
 	}
 	WriteJSON(w, http.StatusCreated, response)
 	return nil

@@ -2,6 +2,7 @@ package service
 
 import (
 	"strconv"
+	"time"
 
 	"github.com/Thomazoide/donde-caigo-backend/config"
 	"github.com/Thomazoide/donde-caigo-backend/models"
@@ -69,5 +70,17 @@ func (s *PostService) DeletePost(postID uint) error {
 	if result.Error != nil {
 		return result.Error
 	}
+	return nil
+}
+
+func (s *PostService) DeleteOldPosts() error {
+	cutOffTime := time.Now().Add(-24 * time.Hour)
+	var oldPosts []models.Post
+	if err := s.instance.Where("created_at < ?", cutOffTime).Find(&oldPosts).Error; err != nil {
+		return err
+	}
+	// for _, post := range oldPosts {
+	// 	picsURLs := strings.Split(post.Pics, ",")
+	// }
 	return nil
 }

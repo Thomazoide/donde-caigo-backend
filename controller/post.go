@@ -133,3 +133,17 @@ func (s *APIServer) handleDeletePost(w http.ResponseWriter, r *http.Request) err
 	WriteJSON(w, http.StatusOK, response)
 	return nil
 }
+
+func (s *APIServer) DeleteOldPosts(w http.ResponseWriter, r *http.Request) error {
+	postService := service.NewPostService()
+	err := postService.DeleteOldPosts()
+	if err != nil {
+		return err
+	}
+	response := &structs.ApiResponse{
+		StatusCode: http.StatusOK,
+		Message:    "posts eliminados",
+	}
+	WriteJSON(w, http.StatusOK, response)
+	return nil
+}

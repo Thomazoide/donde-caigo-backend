@@ -18,6 +18,9 @@ const (
 func UploadImages(ctx context.Context, objectName string, postID uint, file io.Reader) (string, error) {
 	godotenv.Load()
 	var bucket string = os.Getenv("BUCKET")
+	if bucket == "" {
+		return "", fmt.Errorf("error al obtener bucket")
+	}
 	client, err := storage.NewClient(ctx, option.WithCredentialsFile("../config/donde-caigo-448902-cba3eb3a1f3b.json"))
 	if err != nil {
 		return "", fmt.Errorf("error al crear cliente...\nDetalles: %v", err)
@@ -30,4 +33,22 @@ func UploadImages(ctx context.Context, objectName string, postID uint, file io.R
 	wc.Close()
 	var imageURL string = fmt.Sprintf("https://storage.googleapis.com/%s/%s", bucket, objectName)
 	return imageURL, nil
+}
+
+func DeleteImage(ctx context.Context, objectName string) error {
+	godotenv.Load()
+	var bucket string = os.Getenv("BUCKET")
+	if bucket == "" {
+		return fmt.Errorf("error al obtener bucket")
+	}
+	client, err := storage.NewClient(ctx, option.WithCredentialsFile("../config/donde-caigo-448902-cba3eb3a1f3b.json"))
+	if err != nil {
+		return fmt.Errorf("error al crear cliente...\nDetalles: %v", err)
+	}
+	defer client.Close()
+	err = client.Bucket(bucket).Object(objectName).Delete(ctx)
+	if err != nil {
+		return fmt.Errorf("error al eliminar archivo...\nDetalles: %v", err)
+	}
+	return nil
 }

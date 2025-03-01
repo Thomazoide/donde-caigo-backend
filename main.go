@@ -7,6 +7,6 @@ import (
 
 func main() {
 	config.ConnectDB()
-	server := controller.NewAPIServer(":4000")
+	server := controller.NewAPIServer(":8080")
 	server.RunServer()
 }

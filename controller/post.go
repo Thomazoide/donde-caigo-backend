@@ -26,7 +26,7 @@ func (s *APIServer) handlePost(w http.ResponseWriter, r *http.Request) error {
 	response := &structs.ApiResponse{
 		StatusCode: http.StatusMethodNotAllowed,
 		Message:    "METHOD NOT ALLOWED",
-		Error:      fmt.Errorf("method '%s' not allowed\nstatus: %d", r.Method, http.StatusMethodNotAllowed),
+		Error:      fmt.Errorf("method '%s' not allowed\nstatus: %d", r.Method, http.StatusMethodNotAllowed).Error(),
 	}
 	WriteJSON(w, http.StatusMethodNotAllowed, response)
 	return nil

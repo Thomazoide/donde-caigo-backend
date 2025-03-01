@@ -26,18 +26,17 @@ func NewAuthService() *AuthService {
 	}
 }
 
-func (s *AuthService) Login(email string, password string) (*string, error) {
+func (s *AuthService) Login(email string, password string) (*string, *models.UserSchema, error) {
 	var user *models.User
-	if err := s.instance.Where(&models.User{Email: email}).Select("email", "password", "ID").First(&user).Error; err != nil {
-
-		return nil, err
+	if err := s.instance.Where(&models.User{Email: email}).First(&user).Error; err != nil {
+		return nil, nil, err
 	}
 	if !s.encrypter.VerifyPassword(password, user.Password) {
 		fmt.Println(user)
-		return nil, fmt.Errorf("error al verificar contraseña")
+		return nil, nil, fmt.Errorf("error al verificar contraseña")
 	}
 	var token string = GenerateToken(user)
-	return &token, nil
+	return &token, user.ToSchema(), nil
 }
 
 func GenerateToken(user *models.User) string {

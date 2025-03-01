@@ -16,7 +16,7 @@ func (s *APIServer) handleAuth(w http.ResponseWriter, r *http.Request) error {
 	WriteJSON(w, http.StatusMethodNotAllowed, &structs.ApiResponse{
 		StatusCode: http.StatusMethodNotAllowed,
 		Message:    "ONLY POST METHOD ALLOWED",
-		Error:      fmt.Errorf("method not allowed: %s", r.Method),
+		Error:      fmt.Errorf("method not allowed: %s", r.Method).Error(),
 	})
 	return nil
 }
@@ -29,15 +29,16 @@ func (s *APIServer) handleLogin(w http.ResponseWriter, r *http.Request) error {
 		return decodeErr
 	}
 	authService := service.NewAuthService()
-	token, loginErr := authService.Login(authPayload.Email, authPayload.Password)
+	token, userData, loginErr := authService.Login(authPayload.Email, authPayload.Password)
 	if loginErr != nil {
 		return loginErr
 	}
 	authService.SignCookie(w, *token)
-	response := &structs.ApiResponse{
+	response := &structs.LoginResponse{
 		StatusCode: http.StatusAccepted,
-		Message:    "sesion iniciada",
-		Data:       token,
+		Message:    "Sesion iniciada",
+		Token:      *token,
+		UserData:   *userData,
 	}
 	WriteJSON(w, http.StatusAccepted, response)
 	return nil

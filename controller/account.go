@@ -28,7 +28,7 @@ func (s *APIServer) handleAccount(w http.ResponseWriter, r *http.Request) error 
 	WriteJSON(w, http.StatusMethodNotAllowed, &structs.ApiResponse{
 		StatusCode: http.StatusMethodNotAllowed,
 		Message:    "METHOD NOT ALLOWED",
-		Error:      fmt.Errorf("method not allowed: %s", r.Method),
+		Error:      fmt.Errorf("method not allowed: %s", r.Method).Error(),
 	})
 	return nil
 }
@@ -43,7 +43,7 @@ func (s *APIServer) handleAccountWithParams(w http.ResponseWriter, r *http.Reque
 	WriteJSON(w, http.StatusMethodNotAllowed, &structs.ApiResponse{
 		StatusCode: http.StatusMethodNotAllowed,
 		Message:    "METHOD NOT ALLOWED",
-		Error:      fmt.Errorf("method not allowed: %s", r.Method),
+		Error:      fmt.Errorf("method not allowed: %s", r.Method).Error(),
 	})
 	return fmt.Errorf("method not allowed: %s", r.Method)
 }

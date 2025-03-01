@@ -30,7 +30,7 @@ func makeHTTPHandlerFunc(h apiFunc) http.HandlerFunc {
 			response := &structs.ApiResponse{
 				StatusCode: http.StatusBadRequest,
 				Message:    "BAD REQUEST",
-				Error:      err,
+				Error:      err.Error(),
 			}
 			WriteJSON(w, http.StatusBadRequest, response)
 		}

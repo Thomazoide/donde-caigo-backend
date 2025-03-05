@@ -32,6 +32,12 @@ func (s *APIServer) handlePost(w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
+// HandleGetPost se encarga de entregar todos los posts
+// @Summary Entrega todos los posts
+// @Tags Publicaciones
+// @Produce json
+// @Success 200 {object} structs.ApiResponse
+// @Router /publicaciones [get]
 func (s *APIServer) handleGetPost(w http.ResponseWriter, r *http.Request) error {
 	postService := service.NewPostService()
 	posts, err := postService.GetAllPost()
@@ -48,6 +54,14 @@ func (s *APIServer) handleGetPost(w http.ResponseWriter, r *http.Request) error 
 	return nil
 }
 
+// HandleCreatePost se encarga de crear un post
+// @Summary Crear un post
+// @Tags Publicaciones
+// @Accept json
+// @Produce json
+// @Param body body structs.NewPostPayload true "Nuevo post"
+// @Success 201 {object} structs.ApiResponse
+// @Router /publicaciones [post]
 func (s *APIServer) handleCreatePost(w http.ResponseWriter, r *http.Request) error {
 	postService := service.NewPostService()
 	var newPostPayload *structs.NewPostPayload
@@ -68,6 +82,14 @@ func (s *APIServer) handleCreatePost(w http.ResponseWriter, r *http.Request) err
 	return nil
 }
 
+// HandleAddLike se encarga de agregar un like a un post
+// @Summary Agregar un like a un post
+// @Tags Publicaciones
+// @Accept json
+// @Produce json
+// @Param body body structs.LikePayload true "Like a agregar"
+// @Success 202 {object} structs.ApiResponse
+// @Router /publicaciones [patch]
 func (s *APIServer) handleAddLike(w http.ResponseWriter, r *http.Request) error {
 	postService := service.NewPostService()
 	var likePayload *structs.LikePayload
@@ -88,9 +110,17 @@ func (s *APIServer) handleAddLike(w http.ResponseWriter, r *http.Request) error 
 	return nil
 }
 
+// HandleDeletePost se encarga de eliminar un post
+// @Summary Eliminar un post
+// @Tags Publicaciones
+// @Accept json
+// @Produce json
+// @Param body body models.PostSchema true "Post a eliminar"
+// @Success 200 {object} structs.ApiResponse
+// @Router /publicaciones [delete]
 func (s *APIServer) handleDeletePost(w http.ResponseWriter, r *http.Request) error {
 	postService := service.NewPostService()
-	var postToDelete *models.Post
+	var postToDelete *models.PostSchema
 	decodeErr := json.NewDecoder(r.Body).Decode(&postToDelete)
 	if decodeErr != nil {
 		return decodeErr

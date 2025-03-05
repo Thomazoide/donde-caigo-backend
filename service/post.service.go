@@ -77,10 +77,13 @@ func (s *PostService) EditPost(post *models.Post) (*models.Post, error) {
 	return post, nil
 }
 
-func (s *PostService) AddLike(post *models.Post, id uint) (*models.Post, error) {
-	sid := strconv.FormatUint(uint64(id), 10)
-	tmpPost := post
-	tmpPost.Stars = tmpPost.Stars + "," + sid
+func (s *PostService) AddLike(post *models.PostSchema, userId uint) (*models.Post, error) {
+	formatedUserId := strconv.FormatUint(uint64(userId), 10)
+	var tmpPost *models.Post
+	if err := s.instance.Where("id = ?", post.ID).First(&tmpPost).Error; err != nil {
+		return nil, err
+	}
+	tmpPost.Stars = tmpPost.Stars + "," + formatedUserId
 	if err := s.instance.Save(&tmpPost).Error; err != nil {
 		return nil, err
 	}

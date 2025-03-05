@@ -1,0 +1,310 @@
+basePath: /
+definitions:
+  models.PostSchema:
+    properties:
+      author_id:
+        type: integer
+      description:
+        type: string
+      id:
+        type: integer
+      pics:
+        type: string
+      stars:
+        type: string
+      title:
+        type: string
+    type: object
+  models.UserSchema:
+    properties:
+      age:
+        type: integer
+      email:
+        type: string
+      id:
+        type: integer
+      nombre:
+        type: string
+      profileDescription:
+        type: string
+      profilePicture:
+        type: string
+      rut:
+        type: string
+    type: object
+  structs.ApiResponse:
+    properties:
+      data: {}
+      error:
+        type: string
+      message:
+        type: string
+      statusCode:
+        type: integer
+    type: object
+  structs.ChangePasswordPayload:
+    properties:
+      actualPassword:
+        type: string
+      newPassword:
+        type: string
+    type: object
+  structs.LikePayload:
+    properties:
+      id:
+        type: integer
+      post:
+        $ref: '#/definitions/models.PostSchema'
+    type: object
+  structs.LoginPayload:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
+  structs.LoginResponse:
+    properties:
+      message:
+        type: string
+      statusCode:
+        type: integer
+      token:
+        type: string
+      userData:
+        $ref: '#/definitions/models.UserSchema'
+    type: object
+  structs.NewPostPayload:
+    properties:
+      pics:
+        items:
+          type: string
+        type: array
+      post:
+        $ref: '#/definitions/models.PostSchema'
+    type: object
+externalDocs:
+  description: Basado en OpenAPI 3.0
+  url: https://swagger.io/resources/open-api/
+host: localhost:8080
+info:
+  contact:
+    email: ttellerias01@outlook.com
+    name: Thomas Tellerias
+  description: API para la aplicacion de Donde Caigo
+  license:
+    name: Donde Caigo
+  title: Donde Caigo APP
+  version: "0.1"
+paths:
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Credenciales de usuario
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/structs.LoginPayload'
+      produces:
+      - application/json
+      responses:
+        "202":
+          description: Accepted
+          schema:
+            $ref: '#/definitions/structs.LoginResponse'
+      summary: Inicio de sesión
+      tags:
+      - Autenticación
+  /cuenta:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: Usuario a eliminar
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/models.UserSchema'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/structs.ApiResponse'
+      summary: Elimina una cuenta de usuario
+      tags:
+      - Usuarios
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/structs.ApiResponse'
+      summary: Entrega todas las cuentas de usuario
+      tags:
+      - Usuarios
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Usuario a crear
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/models.UserSchema'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/structs.ApiResponse'
+      summary: Crea una cuenta de usuario
+      tags:
+      - Usuarios
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Usuario a actualizar
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/models.UserSchema'
+      produces:
+      - application/json
+      responses:
+        "202":
+          description: Accepted
+          schema:
+            $ref: '#/definitions/structs.ApiResponse'
+      summary: Actualiza una cuenta de usuario
+      tags:
+      - Usuarios
+  /cuenta/{id}:
+    get:
+      parameters:
+      - description: ID del usuario
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/structs.ApiResponse'
+      summary: Entrega una cuenta de usuario por su id
+      tags:
+      - Usuarios
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: ID del usuario
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Payload para cambiar la contraseña
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/structs.ChangePasswordPayload'
+      produces:
+      - application/json
+      responses:
+        "202":
+          description: Accepted
+          schema:
+            $ref: '#/definitions/structs.ApiResponse'
+      summary: Actualiza la contraseña de un usuario
+      tags:
+      - Usuarios
+  /publicaciones:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: Post a eliminar
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/models.PostSchema'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/structs.ApiResponse'
+      summary: Eliminar un post
+      tags:
+      - Publicaciones
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/structs.ApiResponse'
+      summary: Entrega todos los posts
+      tags:
+      - Publicaciones
+    patch:
+      consumes:
+      - application/json
+      parameters:
+      - description: Like a agregar
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/structs.LikePayload'
+      produces:
+      - application/json
+      responses:
+        "202":
+          description: Accepted
+          schema:
+            $ref: '#/definitions/structs.ApiResponse'
+      summary: Agregar un like a un post
+      tags:
+      - Publicaciones
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Nuevo post
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/structs.NewPostPayload'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/structs.ApiResponse'
+      summary: Crear un post
+      tags:
+      - Publicaciones
+schemes:
+- http
+swagger: "2.0"

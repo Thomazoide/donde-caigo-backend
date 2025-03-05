@@ -5,9 +5,11 @@ import (
 	"fmt"
 	"net/http"
 
+	_ "github.com/Thomazoide/donde-caigo-backend/docs"
 	"github.com/Thomazoide/donde-caigo-backend/middleware"
 	"github.com/Thomazoide/donde-caigo-backend/structs"
 	"github.com/gorilla/mux"
+	httpSwagger "github.com/swaggo/http-swagger"
 )
 
 type APIServer struct {
@@ -52,5 +54,6 @@ func (s *APIServer) RunServer() {
 	router.HandleFunc("/cuenta", makeHTTPHandlerFunc(s.handleAccount))
 	router.HandleFunc("/cuenta/{id}", makeHTTPHandlerFunc(s.handleAccountWithParams))
 	router.HandleFunc("/publicaciones", makeHTTPHandlerFunc(s.handlePost))
+	router.PathPrefix("/docs/").Handler(httpSwagger.WrapHandler)
 	http.ListenAndServe(s.listenAddr, router)
 }

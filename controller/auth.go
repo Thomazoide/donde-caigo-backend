@@ -21,6 +21,14 @@ func (s *APIServer) handleAuth(w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
+// HandleLogin se encarga de iniciar sesion
+// @Summary Inicio de sesión
+// @Tags Autenticación
+// @Accept json
+// @Produce json
+// @Param body body structs.LoginPayload true "Credenciales de usuario"
+// @Success 202 {object} structs.LoginResponse
+// @Router /auth/login [post]
 func (s *APIServer) handleLogin(w http.ResponseWriter, r *http.Request) error {
 	var authPayload *structs.LoginPayload
 	decodeErr := json.NewDecoder(r.Body).Decode(&authPayload)

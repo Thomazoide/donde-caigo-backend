@@ -13,6 +13,10 @@ func MiddleWareCookieConsumer(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		uri := r.RequestURI
 		method := r.Method
+		if strings.HasPrefix(uri, "/docs/") {
+			next.ServeHTTP(w, r)
+			return
+		}
 		if (uri == "/auth" || uri == "/cuenta") && (method == http.MethodPost) {
 			next.ServeHTTP(w, r)
 			return

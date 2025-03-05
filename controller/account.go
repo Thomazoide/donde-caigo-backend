@@ -48,6 +48,12 @@ func (s *APIServer) handleAccountWithParams(w http.ResponseWriter, r *http.Reque
 	return fmt.Errorf("method not allowed: %s", r.Method)
 }
 
+// HandleGetAccounts se encarga de entregar todas las cuentas de usuario
+// @Summary Entrega todas las cuentas de usuario
+// @Tags Usuarios
+// @Produce json
+// @Success 200 {object} structs.ApiResponse
+// @Router /cuenta [get]
 func (s *APIServer) handleGetAccounts(w http.ResponseWriter, r *http.Request) error {
 	userService := service.NewUserService()
 	userList, err := userService.GetAllUsers()
@@ -64,6 +70,13 @@ func (s *APIServer) handleGetAccounts(w http.ResponseWriter, r *http.Request) er
 	return nil
 }
 
+// HandleGetAccountByID se encarga de entregar una cuenta de usuario por su id
+// @Summary Entrega una cuenta de usuario por su id
+// @Tags Usuarios
+// @Produce json
+// @Param id path int true "ID del usuario"
+// @Success 200 {object} structs.ApiResponse
+// @Router /cuenta/{id} [get]
 func (s *APIServer) handleGetAccountByID(w http.ResponseWriter, r *http.Request) error {
 	userService := service.NewUserService()
 	vars := mux.Vars(r)
@@ -85,6 +98,14 @@ func (s *APIServer) handleGetAccountByID(w http.ResponseWriter, r *http.Request)
 	return nil
 }
 
+// HandleCreateAccount se encarga de crear una cuenta de usuario
+// @Summary Crea una cuenta de usuario
+// @Tags Usuarios
+// @Accept json
+// @Produce json
+// @Param user body models.UserSchema true "Usuario a crear"
+// @Success 201 {object} structs.ApiResponse
+// @Router /cuenta [post]
 func (s *APIServer) handleCreateAccount(w http.ResponseWriter, r *http.Request) error {
 	userService := service.NewUserService()
 	var newUser models.User
@@ -105,6 +126,14 @@ func (s *APIServer) handleCreateAccount(w http.ResponseWriter, r *http.Request) 
 	return nil
 }
 
+// HandleDeleteAccount se encarga de eliminar una cuenta de usuario
+// @Summary Elimina una cuenta de usuario
+// @Tags Usuarios
+// @Accept json
+// @Produce json
+// @Param user body models.UserSchema true "Usuario a eliminar"
+// @Success 200 {object} structs.ApiResponse
+// @Router /cuenta [delete]
 func (s *APIServer) handleDeleteAccount(w http.ResponseWriter, r *http.Request) error {
 	userService := service.NewUserService()
 	var userToDelete models.User
@@ -125,6 +154,14 @@ func (s *APIServer) handleDeleteAccount(w http.ResponseWriter, r *http.Request) 
 	return nil
 }
 
+// HandleUpdateUser se encarga de actualizar una cuenta de usuario
+// @Summary Actualiza una cuenta de usuario
+// @Tags Usuarios
+// @Accept json
+// @Produce json
+// @Param user body models.UserSchema true "Usuario a actualizar"
+// @Success 202 {object} structs.ApiResponse
+// @Router /cuenta [put]
 func (s *APIServer) handleUpdateUser(w http.ResponseWriter, r *http.Request) error {
 	userService := service.NewUserService()
 	var user *models.User
@@ -145,6 +182,15 @@ func (s *APIServer) handleUpdateUser(w http.ResponseWriter, r *http.Request) err
 	return nil
 }
 
+// HandleUpdatePassword se encarga de actualizar la contraseña de un usuario
+// @Summary Actualiza la contraseña de un usuario
+// @Tags Usuarios
+// @Accept json
+// @Produce json
+// @Param id path int true "ID del usuario"
+// @Param user body structs.ChangePasswordPayload true "Payload para cambiar la contraseña"
+// @Success 202 {object} structs.ApiResponse
+// @Router /cuenta/{id} [post]
 func (s *APIServer) handleUpdatePassword(w http.ResponseWriter, r *http.Request) error {
 	userService := service.NewUserService()
 	id, parseErr := strconv.ParseUint(mux.Vars(r)["id"], 10, 32)

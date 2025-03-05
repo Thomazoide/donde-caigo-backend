@@ -8,16 +8,20 @@ type Post struct {
 	Description string
 	Pics        string
 	AuthorID    uint
+	Lat         float64
+	Lng         float64
 	Stars       string `gorm:"default:null"`
 }
 
 type PostSchema struct {
-	ID          uint   `json:"id"`
-	Title       string `json:"title"`
-	Description string `json:"description"`
-	Pics        string `json:"pics"`
-	AuthorID    uint   `json:"author_id"`
-	Stars       string `json:"stars"`
+	ID          uint    `json:"id"`
+	Title       string  `json:"title"`
+	Description string  `json:"description"`
+	Pics        string  `json:"pics"`
+	AuthorID    uint    `json:"author_id"`
+	Lat         float64 `json:"lat"`
+	Lng         float64 `json:"lng"`
+	Stars       string  `json:"stars"`
 }
 
 func (p *Post) ToSchema() *PostSchema {

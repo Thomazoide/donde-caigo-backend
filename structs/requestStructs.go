@@ -16,3 +16,8 @@ type ChangePasswordPayload struct {
 	ActualPassword string `json:"actualPassword"`
 	NewPassword    string `json:"newPassword"`
 }
+
+type NewPostPayload struct {
+	PostData models.PostSchema `json:"post"`
+	Pics     []string          `json:"pics"`
+}

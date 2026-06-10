@@ -1,12 +1,15 @@
 package middleware
 
 import (
+	"fmt"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
 
 	"github.com/Thomazoide/donde-caigo-backend/config"
 	"github.com/Thomazoide/donde-caigo-backend/models"
+	"github.com/golang-jwt/jwt/v5"
 )
 
 func MiddleWareCookieConsumer(next http.Handler) http.Handler {
@@ -17,16 +20,25 @@ func MiddleWareCookieConsumer(next http.Handler) http.Handler {
 			next.ServeHTTP(w, r)
 			return
 		}
+		if method == http.MethodOptions {
+			next.ServeHTTP(w, r)
+			return
+		}
 		if (uri == "/auth" || uri == "/cuenta") && (method == http.MethodPost) {
 			next.ServeHTTP(w, r)
 			return
 		}
-		accessCookie, err := r.Cookie("access_token")
-		if err != nil {
-			http.Error(w, "access token not fount", http.StatusUnauthorized)
+		authHeader := r.Header.Get("Authorization")
+		if authHeader == "" {
+			http.Error(w, "authorization header not found", http.StatusUnauthorized)
 			return
 		}
-		if !validateAccessToken(accessCookie.Value) {
+		token := authHeader
+		lower := strings.ToLower(authHeader)
+		if strings.HasPrefix(lower, "bearer ") {
+			token = strings.TrimSpace(authHeader[7:])
+		}
+		if !validateAccessTokenV2(token) {
 			http.Error(w, "invalid token", http.StatusUnauthorized)
 			return
 		}
@@ -43,8 +55,12 @@ func parseID(str string) uint {
 	return i
 }
 
+// deprecated
 func validateAccessToken(token string) bool {
 	args := strings.Split(token, ":")
+	if len(args) < 3 {
+		return false
+	}
 	db := config.GetInstance()
 	id := parseID(args[2])
 	pass := args[0]
@@ -54,4 +70,25 @@ func validateAccessToken(token string) bool {
 		return false
 	}
 	return user.Password == pass
+}
+
+func validateAccessTokenV2(tokenString string) bool {
+	secret := []byte(os.Getenv("SECRET"))
+	token, err := jwt.ParseWithClaims(
+		tokenString,
+		jwt.MapClaims{},
+		func(tk *jwt.Token) (any, error) {
+			if tk.Method != jwt.SigningMethodHS256 {
+				return nil, fmt.Errorf("Metodo de encriptacion incorrecto...")
+			}
+			return secret, nil
+		},
+	)
+	if err != nil {
+		return false
+	}
+	if !token.Valid {
+		return false
+	}
+	return true
 }

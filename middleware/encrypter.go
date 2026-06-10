@@ -42,8 +42,6 @@ func (e *Encrypter) HashPassword(password string) (string, error) {
 
 func (e *Encrypter) VerifyPassword(password string, hashedPassword string) bool {
 	passwordAndPepper := password + e.pepper
-	fmt.Println(passwordAndPepper)
 	err := bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(passwordAndPepper))
-	fmt.Println(err)
 	return err == nil
 }

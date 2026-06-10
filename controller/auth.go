@@ -41,11 +41,11 @@ func (s *APIServer) handleLogin(w http.ResponseWriter, r *http.Request) error {
 	if loginErr != nil {
 		return loginErr
 	}
-	authService.SignCookie(w, *token)
+	authService.SignCookie(w, token)
 	response := &structs.LoginResponse{
 		StatusCode: http.StatusAccepted,
 		Message:    "Sesion iniciada",
-		Token:      *token,
+		Token:      token,
 		UserData:   *userData,
 	}
 	WriteJSON(w, http.StatusAccepted, response)

@@ -10,7 +10,7 @@ import (
 	"github.com/Thomazoide/donde-caigo-backend/config"
 	"github.com/Thomazoide/donde-caigo-backend/middleware"
 	"github.com/Thomazoide/donde-caigo-backend/models"
-	"github.com/joho/godotenv"
+	"github.com/golang-jwt/jwt/v5"
 	"gorm.io/gorm"
 )
 
@@ -26,23 +26,37 @@ func NewAuthService() *AuthService {
 	}
 }
 
-func (s *AuthService) Login(email string, password string) (*string, *models.UserSchema, error) {
+func (s *AuthService) Login(email string, password string) (string, *models.UserSchema, error) {
 	var user *models.User
 	if err := s.instance.Where(&models.User{Email: email}).First(&user).Error; err != nil {
-		return nil, nil, err
+		return "", nil, err
 	}
 	if !s.encrypter.VerifyPassword(password, user.Password) {
 		fmt.Println(user)
-		return nil, nil, fmt.Errorf("error al verificar contraseña")
+		return "", nil, fmt.Errorf("error al verificar contraseña")
 	}
-	var token string = GenerateToken(user)
-	return &token, user.ToSchema(), nil
+	token, tokenErr := GenerateTokenV2(user)
+	if tokenErr != nil {
+		return "", user.ToSchema(), tokenErr
+	}
+	return token, user.ToSchema(), nil
 }
 
 func GenerateToken(user *models.User) string {
-	godotenv.Load()
 	var token string = user.Password + ":" + fmt.Sprintf("%d", rand.Int()) + ":" + fmt.Sprint(user.ID) + ":" + os.Getenv("SECRET")
 	return token
+}
+func GenerateTokenV2(user *models.User) (string, error) {
+	secret := []byte(os.Getenv("SECRET"))
+	claims := jwt.MapClaims{
+		"ID":     user.ID,
+		"email":  user.Email,
+		"nombre": user.Nombre,
+		"exp":    time.Now().Add(24 * time.Hour).Unix(),
+		"iat":    time.Now().Unix(),
+	}
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	return token.SignedString(secret)
 }
 
 func (s *AuthService) SignCookie(w http.ResponseWriter, token string) {

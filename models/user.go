@@ -13,7 +13,8 @@ type User struct {
 	ProfileDescription string
 	Password           string
 	Age                int64
-	Posts              []Post `gorm:"foreignKey:AuthorID;default:null"`
+	Posts              []Post `gorm:"foreignKey:AuthorID;default:null;"`
+	StarredPosts       []Post `gorm:"many2many:post_stars;"`
 }
 
 type UserSchema struct {

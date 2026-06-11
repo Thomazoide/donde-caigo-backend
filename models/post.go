@@ -10,7 +10,8 @@ type Post struct {
 	AuthorID    uint
 	Lat         float64
 	Lng         float64
-	Stars       string `gorm:"default:null"`
+	StarsCount  int
+	StarUsers   []User `gorm:"many2many:post_stars;"`
 }
 
 type PostSchema struct {
@@ -21,7 +22,7 @@ type PostSchema struct {
 	AuthorID    uint    `json:"author_id"`
 	Lat         float64 `json:"lat"`
 	Lng         float64 `json:"lng"`
-	Stars       string  `json:"stars"`
+	StarsCount  int     `json:"stars"`
 }
 
 func (p *Post) ToSchema() *PostSchema {
@@ -31,7 +32,7 @@ func (p *Post) ToSchema() *PostSchema {
 		Description: p.Description,
 		Pics:        p.Pics,
 		AuthorID:    p.AuthorID,
-		Stars:       p.Stars,
+		StarsCount:  p.StarsCount,
 	}
 }
 
@@ -41,5 +42,6 @@ func CreatePost(title string, desc string, pics string, authorID uint) *Post {
 		Description: desc,
 		Pics:        pics,
 		AuthorID:    authorID,
+		StarsCount:  0,
 	}
 }

@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"fmt"
 	"strconv"
 	"time"
 
@@ -77,17 +78,58 @@ func (s *PostService) EditPost(post *models.Post) (*models.Post, error) {
 	return post, nil
 }
 
+// @Deprecated
 func (s *PostService) AddLike(post *models.PostSchema, userId uint) (*models.Post, error) {
-	formatedUserId := strconv.FormatUint(uint64(userId), 10)
+	//formatedUserId := strconv.FormatUint(uint64(userId), 10)
 	var tmpPost *models.Post
 	if err := s.instance.Where("id = ?", post.ID).First(&tmpPost).Error; err != nil {
 		return nil, err
 	}
-	tmpPost.Stars = tmpPost.Stars + "," + formatedUserId
+	//tmpPost.Stars = tmpPost.Stars + "," + formatedUserId
 	if err := s.instance.Save(&tmpPost).Error; err != nil {
 		return nil, err
 	}
 	return tmpPost, nil
+}
+
+func (s *PostService) AddLikeV2(postID uint, userID uint) (*models.Post, error) {
+	var createdPost *models.Post
+	err := s.instance.Transaction(func(tx *gorm.DB) error {
+		var usr *models.User
+		if err := tx.First(&usr, userID).Error; err != nil {
+			return err
+		}
+		var pst models.Post
+		if err := tx.First(&pst, postID).Error; err != nil {
+			return err
+		}
+		var alreadyLiked bool
+		if err := tx.Raw(`
+			SELECT EXISTS(
+				SELECT 1
+				FROM post_stars
+				WHERE post_id = ? AND user_id = ?
+			)
+		`, postID, userID).Scan(&alreadyLiked).Error; err != nil {
+			return err
+		}
+		if alreadyLiked {
+			return fmt.Errorf("Already liked")
+		}
+		if err := tx.Model(&pst).Association("StarUsers").Append(&usr); err != nil {
+			return err
+		}
+		if err := tx.Model(&models.Post{}).Where("id = ?", postID).UpdateColumn("stars_count", gorm.Expr("stars_count + ?", 1)).Error; err != nil {
+			return err
+		}
+		createdPost = &pst
+		createdPost.StarsCount++
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	return createdPost, nil
 }
 
 func (s *PostService) DeletePost(postID uint) error {

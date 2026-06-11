@@ -37,6 +37,17 @@ func NewPicturesMiddleware() *PicturesMiddleware {
 	}
 }
 
+func (pm *PicturesMiddleware) UploadTemporalImage(ctx context.Context, fileName string, picture []byte) (string, error) {
+	writer := pm.client.Bucket(pm.bucket).Object(fileName).NewWriter(ctx)
+	writer.ContentType = "image/jpeg"
+	defer writer.Close()
+	if _, writeErr := writer.Write(picture); writeErr != nil {
+		return "", writeErr
+	}
+	pictureURL := "http://storage.googleapis.com/" + pm.bucket + "/tmp/" + fileName
+	return pictureURL, nil
+}
+
 func (pm *PicturesMiddleware) UploadImage(ctx context.Context, fileName string, picture []byte) (string, error) {
 	writer := pm.client.Bucket(pm.bucket).Object(fileName).NewWriter(ctx)
 	writer.ContentType = "image/jpeg"

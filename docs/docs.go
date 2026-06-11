@@ -325,18 +325,18 @@ const docTemplate = `{
                 "summary": "Agregar un like a un post",
                 "parameters": [
                     {
-                        "description": "Like a agregar",
+                        "description": "Like o Star",
                         "name": "body",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/structs.LikePayload"
+                            "$ref": "#/definitions/structs.LikePayloadV2"
                         }
                     }
                 ],
                 "responses": {
-                    "202": {
-                        "description": "Accepted",
+                    "200": {
+                        "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/structs.ApiResponse"
                         }
@@ -358,11 +358,17 @@ const docTemplate = `{
                 "id": {
                     "type": "integer"
                 },
+                "lat": {
+                    "type": "number"
+                },
+                "lng": {
+                    "type": "number"
+                },
                 "pics": {
                     "type": "string"
                 },
                 "stars": {
-                    "type": "string"
+                    "type": "integer"
                 },
                 "title": {
                     "type": "string"
@@ -429,6 +435,17 @@ const docTemplate = `{
                 },
                 "post": {
                     "$ref": "#/definitions/models.PostSchema"
+                }
+            }
+        },
+        "structs.LikePayloadV2": {
+            "type": "object",
+            "properties": {
+                "postID": {
+                    "type": "integer"
+                },
+                "userID": {
+                    "type": "integer"
                 }
             }
         },

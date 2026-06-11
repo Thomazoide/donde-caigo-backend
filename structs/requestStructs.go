@@ -12,6 +12,11 @@ type LikePayload struct {
 	Id   uint              `json:"id"`
 }
 
+type LikePayloadV2 struct {
+	PostID int `json:"postID"`
+	UserID int `json:"userID"`
+}
+
 type ChangePasswordPayload struct {
 	ActualPassword string `json:"actualPassword"`
 	NewPassword    string `json:"newPassword"`

@@ -18,7 +18,7 @@ func (s *APIServer) handlePost(w http.ResponseWriter, r *http.Request) error {
 		return s.handleCreatePost(w, r)
 	}
 	if r.Method == http.MethodPatch {
-		return s.handleAddLike(w, r)
+		return s.handleAddLikeV2(w, r)
 	}
 	if r.Method == http.MethodDelete {
 		return s.handleDeletePost(w, r)
@@ -83,6 +83,7 @@ func (s *APIServer) handleCreatePost(w http.ResponseWriter, r *http.Request) err
 }
 
 // HandleAddLike se encarga de agregar un like a un post
+// @Deprecated
 // @Summary Agregar un like a un post
 // @Tags Publicaciones
 // @Accept json
@@ -107,6 +108,33 @@ func (s *APIServer) handleAddLike(w http.ResponseWriter, r *http.Request) error 
 		Data:       updatedPost,
 	}
 	WriteJSON(w, http.StatusAccepted, response)
+	return nil
+}
+
+// Handle add Like V2 es la nueva forma de dar un Like o Star
+// @Summary Agregar un like a un post
+// @Tags Publicaciones
+// @Accept json
+// @Produce json
+// @Param body body structs.LikePayloadV2 true "Like o Star"
+// @Success 200 {object} structs.ApiResponse
+// @Router /publicaciones [patch]
+func (s *APIServer) handleAddLikeV2(w http.ResponseWriter, r *http.Request) error {
+	postService := service.NewPostService()
+	var likePayload *structs.LikePayloadV2
+	if decodeErr := json.NewDecoder(r.Body).Decode(&likePayload); decodeErr != nil {
+		return decodeErr
+	}
+	updatedPost, updateErr := postService.AddLikeV2(uint(likePayload.PostID), uint(likePayload.UserID))
+	if updateErr != nil {
+		return updateErr
+	}
+	response := &structs.ApiResponse{
+		StatusCode: http.StatusOK,
+		Message:    "Like agregado",
+		Data:       updatedPost,
+	}
+	WriteJSON(w, http.StatusOK, response)
 	return nil
 }
 

@@ -8,10 +8,14 @@ definitions:
         type: string
       id:
         type: integer
+      lat:
+        type: number
+      lng:
+        type: number
       pics:
         type: string
       stars:
-        type: string
+        type: integer
       title:
         type: string
     type: object
@@ -55,6 +59,13 @@ definitions:
         type: integer
       post:
         $ref: '#/definitions/models.PostSchema'
+    type: object
+  structs.LikePayloadV2:
+    properties:
+      postID:
+        type: integer
+      userID:
+        type: integer
     type: object
   structs.LoginPayload:
     properties:
@@ -269,17 +280,17 @@ paths:
       consumes:
       - application/json
       parameters:
-      - description: Like a agregar
+      - description: Like o Star
         in: body
         name: body
         required: true
         schema:
-          $ref: '#/definitions/structs.LikePayload'
+          $ref: '#/definitions/structs.LikePayloadV2'
       produces:
       - application/json
       responses:
-        "202":
-          description: Accepted
+        "200":
+          description: OK
           schema:
             $ref: '#/definitions/structs.ApiResponse'
       summary: Agregar un like a un post
